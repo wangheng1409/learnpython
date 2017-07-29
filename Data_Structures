@@ -149,8 +149,8 @@ dest= [x for x in filter(lambda j: len(j) > 1, [i['context'].split('到达') for
 
 
 
-#1.字母a-z
-s=[chr(i) for i in range(97,123)]
+#1.字母a-z/A-Z
+s=[chr(i) for i in [x for x in range(97,123)]+[x for x in range(65,91)]]
 
 # 2.列表解析if位置
 s=[i if 1 else 0 for i in (range(5) if 0 else range(10))]
