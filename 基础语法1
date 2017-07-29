@@ -1,0 +1,293 @@
+
+#装饰器
+@a
+def fun():pass
+
+@a
+@b
+def fun():pass
+
+@a
+class A:pass
+
+@a
+async fun():pass
+
+
+#parameters
+def fun(a,b=1,*arg,**kwaggs):pass
+
+def fun(a,b=1,c=2,*,d=3):pass
+
+def fun(a:'b',):pass
+
+def fun() -> str:pass
+
+
+#lambdef
+x = lambda : 1
+x = lambda a: a+1
+x = lambda a=10: a+1
+x = lambda *arg,**kwargs: 1
+x=lambda i: x(i-1) if i >1 else 0
+
+
+#while
+while not 0:
+    pass
+    continue
+    break
+else:pass
+
+#for
+for i in range(-10):pass
+else:pass
+
+
+#try
+try:
+    pass
+finally:
+    pass
+
+try:
+    pass
+except:
+    pass
+
+try:
+    pass
+except Exception as e:
+    pass
+except:
+    pass
+
+try:
+    pass
+except Exception as e:
+    pass
+else:
+    pass
+
+try:
+    pass
+except:
+    pass
+else:
+    pass
+finally:
+    pass
+
+#list ->del
+s=[1,2,3]
+del s
+print(s)
+
+s=[1,2,3]
+del s[:]
+print(s)
+
+def fun():
+    print(os.system('clear'))
+import os
+
+import os
+def fun():
+    if 1:
+        print(os.system('clear'))
+    else:
+        import os
+        print(123)
+
+
+a=1
+def fun():
+    print(a+1)
+
+def fun():
+    a+=1
+    print(a)
+
+
+#key error
+
+s={}
+
+s.setdefault([])
+
+from collections import defaultdict
+s=defaultdict(list)
+
+# 大量append /pop
+
+from collections import deque  #  or redis list
+s=deque()
+s.appendleft(1)
+s.pop()
+
+
+
+
+s=[
+    {'time': "2017-07-26 13:37:10", 'context': "交易成功"},
+    {'time': "2017-07-25 15:58:01", 'context': "快件已签收,感谢您使用中通快递!"},
+    {'context':'东城二部 的 张军军<a href="tel:18001368973">18001368973</a> 正在派件,请保持电话畅通哦!','time':"2017-07-25 14:39:34"},
+    {'time': "2017-07-25 14:16:26", 'context': "快件到达 东城二部"},
+    {'time': "2017-07-25 12:00:08", 'context': "快件已从 北京市内部 发出"},
+    {'time': "2017-07-24 00:30:17", 'context': "快件已从 深圳中心 发出"},
+    {'time': "2017-07-24 00:28:28", 'context': "快件到达 深圳中心"},
+    {'time': "2017-07-23 21:45:29", 'context': "快件已从 深圳公明 发出"},
+    {'time': "2017-07-23 15:39:11", 'context': "深圳公明 的 客户仁清 已揽件"},
+    {'time': "2017-07-23 15:06:52", 'context': "卖家发货"},
+    {'time': "2017-07-23 13:36:07", 'context': "您的订单待配货"},
+    {'time': "2017-07-23 13:36:07", 'context': "您的包裹已出库"},
+    {'time': "2017-07-23 11:32:15", 'context': "您的订单开始处理"},
+]
+
+origin = [x for x in filter(lambda j: len(j) > 1, [i['context'].split('发出') for i in context])][-1][0].split(' ')[1]
+dest= [x for x in filter(lambda j: len(j) > 1, [i['context'].split('到达') for i in context])][0][1]
+
+
+
+#1.字母a-z
+s=[chr(i) for i in range(97,123)]
+
+# 2.列表解析if位置
+s=[i if 1 else 0 for i in (range(5) if 0 else range(10))]
+
+#3、练习删除一个列表 del a  |  del a[:]
+#list ->del
+s=[1,2,3]
+del s
+print(s)
+
+s=[1,2,3]
+del s[:]
+print(s)
+
+#int
+    bit_length #二进制长度
+
+#float
+
+    as_integer_ratio #分数
+    '''
+    >>> (10.0).as_integer_ratio()
+    (10, 1)
+    >>> (0.0).as_integer_ratio()
+    (0, 1)
+    >>> (-.25).as_integer_ratio()
+    (-1, 4)
+    '''
+    hex() #转16进制
+str
+s='abc'
+s.capitalize() #首字母大写，有返回值
+s.center(width=10,fillchar=' ') #居中补全
+s.count('a',0,-1) #字符出现次数
+s.encode(encoding='utf8') #转字节
+s.endswith('c') #以什么结束
+s.startswith('c') #以什么开始
+s.find('b',0,-1) #  返回最小索引／找不到返回-1
+s.index('b',0,-1) #返回最小索引/找不到ValueError
+s.isalnum() #字母或数字
+s.isalpha() #字母
+s.isdecimal() #小数
+s.isdigit() #数字
+s.islower() #小写
+s.isnumeric() #数字
+s.isupper() #大写
+s.istitle() #标题
+
+s.join(['1','2']) #用什么连接列表
+s.lower() #转小写
+s.upper() #转大写
+s.title()#转标题
+
+s.lstrip()/s.rsplit()/s.strip() #去除某字符／默认是空格
+s.split('b',2) #分割默认分割一次
+s.replace(old='b',new='e',count=1)#替换字符
+
+list
+s=['a','b','c']
+s=list('abc')
+s.sort(key=None)/sorted(s,key=None) #    排序
+s.index('a') #元素最小索引／找不到ValueError
+s.append('1') #追加／return None
+s.clear() #清空／return None
+s.count('a') #出现次数
+s.insert(0,'s') #位置0插入's'
+s.extend([]) #扩展列表
+s.pop(0) #删除索引位置元素／默认-1
+s.remove('a')#移除元素／不存在ValueError／return None
+s.reverse()/s[::-1] #反转
+
+dict
+d={}
+d=dict()
+d=d.fromkeys(['a','b','c'],1) #创建值相等的字典
+d.get('a', None)
+d.items() # (k,v)
+d.keys() #k
+d.values() #v
+d.pop('a',None) #找不到'a'返回None
+d.setdefault('a',[])
+d.update({'a':2})
+
+tuple
+s=tuple([1,2,3])
+s=(1,2,3)
+
+set
+
+s=set([1,2,3])
+s={1,2,3}
+s.update(4)
+s.pop() #随机删
+s.remove('a') #移除'a'
+s.clear()
+s.add()
+
+from collections import deque
+s=deque()
+s.appendleft('a')
+s.popleft()
+s.remove('a')
+s.extend(['b'])
+
+
+from collections import OrderedDict
+s=OrderedDict()
+s['a']=1
+s['b']=1
+print(s)
+
+
+from collections import defaultdict
+s=defaultdict(int)
+s=defaultdict(list)
+s=defaultdict(dict)
+s=defaultdict(set)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
