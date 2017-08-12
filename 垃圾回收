@@ -1,0 +1,99 @@
+1.有return和没return的区别
+  def func(x):
+      if x:
+          return
+
+  def func1(x):
+      if x:
+          pass
+
+  import dis
+  print(dis.dis(func))
+  print('=================================')
+  print(dis.dis(func1))
+
+  结果：
+    2           0 LOAD_FAST                0 (x)
+                2 POP_JUMP_IF_FALSE        8
+
+    3           4 LOAD_CONST               0 (None)
+                6 RETURN_VALUE
+          >>    8 LOAD_CONST               0 (None)
+               10 RETURN_VALUE
+  None
+  =================================
+    6           0 LOAD_FAST                0 (x)
+                2 POP_JUMP_IF_FALSE        4
+
+    7     >>    4 LOAD_CONST               0 (None)
+                6 RETURN_VALUE
+  None
+
+  两个return来自不同的栈空间
+2.python传参（值传递／引用传递）
+  按绑定关系传递
+  主要看等号右边的值或者对象是否改变
+3.匿名函数
+  可以用于callback
+  def f（func）：
+    x=1
+    return func(x)
+  f(lambdax:x+1)
+  >>2
+4.垃圾回收
+  a.引用计数
+    引用数增加：
+      对象被创建并绑定到变量 a=A()
+      对象被引用 b=c=a
+      对象被作为参数传递到函数中
+      对象作为元素存储在容器中 m=[a,a,a]
+    引用数减少：
+      对象变量名被显式销毁 del a
+      对象变量名被绑定到其它值 a=B()
+      对象所在作用域结束 fun（a）结束
+      对象所在容器被销毁或从容器中删除 del m，del m[0]
+      
+    class A():
+       pass
+
+    import sys
+    print(sys.getrefcount(A))  #5
+    print(sys.getrefcount(A())) #1
+    
+    
+ 分代收集：
+  一代：新建对象
+  二代：在一代回收检查中存活的
+  三代：在二代回收检查中存活的
+  import gc
+  print(gc.get_count()) #当前回收计数
+  #（41，4，1）41：创建到一代对象-已经销毁的一代对象，剩下的一代对象；
+  #            4：一代对象已经回收4次
+  #             1：二代对象回收了一次
+  print(gc.get_threshold()) #回收阈值
+  #      （700，10，10）700：存活对象达到700，就会进行一次一代对象清理
+
+5.闭包
+  def outer():
+    x,y=[],1
+    def inner(w):
+      z=2
+      x.append(w)
+      return x
+    return inner
+  
+  a:嵌套函数
+  b：内层函数引用非全局变量
+  c：外层函数被调用，返回一个闭包
+  d：闭包=整个子函数+自由变量
+  f：每次外层函数被调用，返回一个新的闭包
+ 函数判断闭包：f.func_closure. or f.__closure__  看是否返回cell对象
+ 
+ 
+
+
+  
+    
+
+
+
