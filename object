@@ -108,6 +108,28 @@ __repr__:
   一般复写repr
 __str__:先调用str方法，再调用repr方法
 
+class A:
+
+
+    def __init__(self, value):
+        self.value = value
+
+    def __add__(self, value):
+
+        return self.value + value
+
+    def __radd__(self, value):
+        return value+self.value
+
+    def __iadd__(self, value):
+        self.value += value
+        return self.value
+a=A(1)
+print(a+2.0)
+print(2.0+a)
+a+=2
+print(a)
+
 程序：
   基类：
   """
