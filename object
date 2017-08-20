@@ -130,6 +130,25 @@ print(2.0+a)
 a+=2
 print(a)
 
+class Boy:
+    def __init__(self, value):
+        self.value = value
+    def __add__(self, value):
+        return self.value + value
+class Girl:
+    def __init__(self, value):
+        self.value = value
+    def __add__(self, value):
+        if isinstance(value,Boy):
+            return Child()
+        return self.value + value
+class Child:
+    def __repr__(self):
+        return 'I am a child'
+boy=Boy(1)
+girl=Girl(2)
+print(girl+boy)
+
 程序：
   基类：
   """
