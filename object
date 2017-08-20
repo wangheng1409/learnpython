@@ -1,0 +1,288 @@
+class A:
+    def func(a):
+        pass
+    def func(a,b):
+        pass
+# a:self 
+
+class Base:
+    def func(self,a):
+        return  a+10
+
+class Child(Base):
+    def func(self,a,b):
+        return a*b
+c=Child()
+s=c.func(1,2) #先找自己，再找父类
+print(s)
+
+cookies／Headers：
+    from scrapy.http.headers import Headers
+    s=Headers()
+    s['a']='1'
+    s['b']='2'
+
+    print(s.to_unicode_dict())
+
+    from http.cookies import SimpleCookie
+    s=b'cookie2=1cae4567309f041346149d4de0590a1c;Domain=.taobao.com;Path=/;HttpOnly'
+    c=SimpleCookie(s.decode())
+
+
+
+#cls：代表类，cls==class obj
+class a:
+    def __init__(self,name,age):
+        self.name =name
+        self.age = age
+    @classmethod
+    def b(cls):
+        name='a' #可以从mongo数据库来
+        age=1
+        return cls(name,age)
+print(a.b().name)
+
+class A:
+
+    @classmethod
+    def b(cls):
+        cls.name='a'
+        cls.age=1
+        return cls()
+
+a=A.b()
+print(a.age) #1
+print(A.age) #1
+
+'''
+类(Class) ：用户通过定义一组属性以定义一种对象的原型，用于表征该类的任何对象。属性是指数据成员（类变量和实例变量）和方法。
+对象（Object）：根据类定义的实例，包含数据成员与方法。
+实例（ Instance ）：类的一个单独的对象，是该类所代表的原型的特定实例之一。
+类变量（Class variable）：被类的所有实例共享的变量。类变量定义在类里，但再任何方法之外。
+实例变量（Instance variable）：定义在方法内部，且只属于当前实例的变量。
+数据成员（ Data member ）：类或实例的变量，用于保存相关联的数据。
+方法（Method）：定义在类里面的函数，代表着类的实例具有的行为。
+'''
+
+'''
+函数重载：让一个函数有多种行为。行为因传入的参数或对象类型的不同而不同
+运算符重载：让一个运算符有多种功能（__add__:int+，str+）
+封装：一类数据和行为封装成类
+继承：子类拥有父类的数据和方法
+'''
+
+python3.6 继承：
+class Base:pass
+class Child(Base):
+    def __init__(self):
+        super().__init__()
+        
+属性访问：.   or getattr(b,'a',3) 获取b对象的‘a’属性，没有默认3
+hasattr(b,'a') return True /False
+setattr(b,'a',2)
+delattr(b,'a')
+
+
+print(c.__dict__)  -> {'name': 'Dear', 'age': 18} #当前实例所拥有属性组成的字典
+# c.a = 1  == c.__dict__[a] = 1 
+print(c.__doc__)  -> 文档字符串
+print(c.__module__)  -> '__main__' #显示函数被那个模块所调用,当前为__main__
+  python a.py 模块名：__main__    直接被python解释器执行的都是__main__ 
+  import b  模块名：b
+print(C.__bases__) -> (<class 'object'>,) #由父类组成的元组, 注意用的是类C 而不是实例c 
+  object.__bases__   （）
+  type.__bases__      （<class 'object'>,）
+  '__bases__' in dir(object) False
+  hasattr(object,'__bases__')  #dir获取到的不一定是所有属性，一般判断属性用hasattr
+
+
+多继承，先继承子类，再继承父类
+
+type：只能判断到当前类
+isinstance ：父类也可以
+
+__repr__:
+  return 必须是字符串
+  只要复写：调用str or repr 都会返回字符串，
+  只会调用repr方法
+  一般复写repr
+__str__:先调用str方法，再调用repr方法
+
+程序：
+  基类：
+  """
+~~~~~~~~~~~~~~~
+This is an abstract class of BoExtractor...
+Every BoExtractor... should inherit from BoExtractor and implement
+method `feed()` and method `extract()`, also, a property named `template`
+should be declared.
+"""
+from abc import ABC, abstractclassmethod, abstractproperty
+from typing import List
+
+
+class BoExtractor(ABC):
+    def __init__(self):
+        super(BoExtractor, self).__init__()
+
+    @abstractproperty
+    def template(self):
+        pass
+
+    @abstractclassmethod
+    def extract(self, html_list: List[str]) -> List[str]:
+        pass
+
+    @abstractclassmethod
+    def feed(self, html_list: List[str]) -> str:
+        """
+        :param html_list: all htmls which used to
+        :return:
+        """
+        pass
+子类1：table to json
+    from bo_lib.scrapy_tools.bo_extractor import BoExtractor
+    import pandas as pd
+
+    class BoExtractorWebChart(BoExtractor):
+        def __init__(self):
+            super(BoExtractorWebChart, self).__init__()
+
+        def extract(self, html_list:list):
+            '''
+
+            :param html_list: table list ,type(table)==str
+            :return: json list
+            '''
+            json_list=[]
+            for table in html_list:
+                data = pd.read_html(table, encoding='utf8', )[0]
+                json_str = data.to_json(orient='index', force_ascii=False)
+                json_list.append(json_str)
+            return json_list
+
+        def feed(self, html_list):
+            pass
+  
+子类2：list html 解析
+import re
+from typing import List, Tuple
+from lxml.html import fromstring
+from bo_extractor import BoExtractor
+
+
+class BoExtractorListStr(BoExtractor):
+    def __init__(self):
+        super(BoExtractorListStr, self).__init__()
+        self._template = ''
+
+    @property
+    def template(self):
+        return self._template
+
+    @template.setter
+    def template(self, value):
+        self._template = value
+
+    def feed(self, html_list: List[str]) -> None:
+        """
+        :param html_list: list of html code of the list. Do not provide the whole html document.
+        :return: None
+        """
+        cleaner_text_list = []
+        for html in html_list:
+            fuse_text = self.extract_fuse_text(html)
+            cleaner_text = self.clean_text(fuse_text)
+            cleaner_text_list.append(cleaner_text)
+        self.extract_template(cleaner_text_list)
+
+    def extract(self, html_list: List[str]) -> List[dict]:
+        result_list = []
+        for html in html_list:
+            fuse_text = self.extract_fuse_text(html)
+            cleaner_text = self.clean_text(fuse_text)
+            result_list.append(cleaner_text)
+            # result_list.append(self.do_extract(cleaner_text))
+        return result_list
+
+    def do_extract(self, cleaner_text: str) -> dict:
+        result_dict = {}
+        for index, line in enumerate(self.template):
+            result_dict[line] = cleaner_text.split('\n')[index][len(line):]
+        return result_dict
+
+    def extract_fuse_text(self, html: str) -> str:
+        html = html.replace('><', '>\n<')
+        selector = fromstring(html)
+        div_list = selector.xpath('//div')
+        fuse_text = ''.join([div.xpath('string(.)') for div in div_list])
+        return fuse_text
+
+    def clean_text(self, fuse_text: str) -> str:
+        dirty_text = fuse_text.replace('\r', '')
+        dirty_text = re.sub('   *', '  ', dirty_text)
+        dirty_text = re.sub('\n\n*', '\n', dirty_text)
+        dirty_text = dirty_text.replace('\xa0', '')
+        cleaner_text = '\n'.join([line.strip() for line in dirty_text.split('\n') if line.strip()])
+        return cleaner_text
+
+    def extract_template(self, cleaner_text_list: List[str]) -> None:
+        for cleaner_text in cleaner_text_list:
+            if not self._template:
+                self._template = [line for line in cleaner_text.split('\n')]
+            else:
+                self.compare(cleaner_text)
+
+    def compare(self, cleaner_text: str) -> None:
+        for index, line in enumerate(self._template):
+            # self._template[index] = self.find_lcsubstr(line, cleaner_text.split('\n')[index])[0]
+            self._template[index] = self.find_lcsubstr_from_start(line, cleaner_text.split('\n')[index])
+
+    def find_lcsubstr(self, s1: str, s2: str) -> Tuple[str, int]:
+        """
+        use matrix to extract the longest common substring
+             a  b  c  d  e  f
+        [[0, 0, 0, 0, 0, 0, 0],
+         [0, 1, 0, 0, 0, 0, 0],  a
+         [0, 0, 2, 0, 0, 0, 0],  b
+         [0, 0, 0, 3, 0, 0, 0],  c
+         [0, 0, 0, 0, 0, 0, 0],  k
+         [0, 0, 0, 0, 0, 0, 0],  k
+         [0, 0, 0, 0, 0, 0, 1]]  f
+        so the longest common str is `abc`
+        :param s1: string 1
+        :param s2: string 2
+        :return: the longest common substring, the length of the lcs
+        """
+        lcs_matrix = [[0 for _ in range(len(s2) + 1)] for _ in range(len(s1) + 1)]  # matrix of zero in (len(s1) + 1) * (len(s2) + 1)
+        lcs_length = 0  # the length of the longest common substring
+        lcs_last_char_index = 0  # the index of the last char of the longest common substring
+        for i in range(len(s1)):
+            for j in range(len(s2)):
+                if s1[i] == s2[j]:
+                    lcs_matrix[i + 1][j + 1] = lcs_matrix[i][j] + 1
+                    if lcs_matrix[i + 1][j + 1] > lcs_length:
+                        lcs_length = lcs_matrix[i + 1][j + 1]
+                        lcs_last_char_index = i + 1
+        return s1[lcs_last_char_index - lcs_length:lcs_last_char_index], lcs_length
+
+    def find_lcsubstr_from_start(self, s1, s2):
+        for i in range(len(s1)):
+            if s1[i] != s2[i]:
+                return s1[: i]
+        else:
+            return s1
+
+    def dump_template(self):
+        pass
+
+    def load_template(self):
+        pass
+
+
+
+
+
+
+
+
