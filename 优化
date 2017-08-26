@@ -1,0 +1,62 @@
+1.init 变量的初始化
+  new 构造方法，负责对象的创建
+ init执行的时候，对象已存在
+
+  libs 跟业务无关的一些
+2.序列化
+  json 效率稍差，跨平台，跨语言，注意\ 转／
+  pickle/cpickle 效率好一点，只支持python
+  protobuf ：效率高，提前设计好的数据结构不能随意改变
+ 
+  结论：没有传输效率问题，都用json，否则用protobuf
+
+3.配置文件解析
+  configparser:解析windows ini 风格的配置文件
+  yaml／json
+
+4.多个if条件用dict代替
+5.短路运算：
+  and ：前一个为假，不再进行后一个条件
+  or ：直到一个为真的条件为止
+  s=[]
+  t=not s and not s.append(1)
+6.成员测试：
+  使用in ／not in ，不用index／find
+7.内置排序
+ sort只是list的方法，修改原列表，返回值为none
+ sorted 可以对字符串，列表，字典进行排序
+8.tuple 不可变，保存于python运行环境，内存占用少
+  set 添加删除，求交并差，比list效率高
+9.使用import a.b 代替 from a import b
+10.交换变量：x,y=y,x
+11.with as 避免显示关闭资源
+  操作数据库，文件
+  import contextlib
+  
+  @contextlib.contextmanager
+  def worker_state(x,v):
+      x.append(v)
+      try:
+          yield
+      finally:
+          x.remove(v)
+  with worker_state([],1) :
+    pass
+12.字符串链接：
+  jion ／+ ：jion更省内存
+13.copy/deepcopy
+  import copy
+  a=[[1,2],[3,4]]
+  b=copy.copy(a)
+  c=copy.deepcopy(a)
+  print(id(a),id(b),id(c))
+  b[0][1]=5
+  print(a,b,c,sep='\n')
+14.for line in f;代替 for line in f.readlines
+15.减少循环嵌套，一般不超过两层
+  大循环放在最里层
+  即相似操作放在一起，充分利用各种cache，操作系统和cpu局部性原理
+  尽量使用局部变量，
+  能放在循环外的要放在循环外
+
+  
