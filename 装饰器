@@ -1,0 +1,243 @@
+1.功能：增强函数
+     代码重构
+     面向切面编程时，在每个层前后做某个事，比如logging
+2。命名空间／作用域：
+  进程之间命名空间不同；
+  py文件，全局作用域，命名空间
+3.with 语句：
+  a:
+  
+    from contextlib import contextmanager
+
+    @contextmanager
+    def demo():
+        print(
+        '[Allocate resources]')
+        print(
+        'Code before yield-statement executes in __enter__')
+        yield '*** contextmanager demo ***'
+        print(
+        'Code after yield-statement executes in __exit__')
+        print(
+        '[Free resources]')
+
+
+    with demo() as value:
+        print(
+        'Assigned Value: %s' % value)
+  b:
+    class DummyResource:
+      def __init__(self, tag):
+          self.tag = tag
+          print ('Resource [%s]' % tag)
+      def __enter__(self):
+          print('[Enter %s]: Allocate resource.' % self.tag)
+          return self   # 可以返回不同的对象
+      def __exit__(self, exc_type, exc_value, exc_tb):
+          print ('[Exit %s]: Free resource.' % self.tag)
+          if exc_tb is None:
+              print ('[Exit %s]: Exited without exception.' % self.tag)
+          else:
+              print ('[Exit %s]: Exited with exception raised.' % self.tag)
+              return False   # 可以省略，缺省的None也是被看做是False
+
+    with DummyResource('normal'):
+        print(1)
+ c:
+    import contextlib  
+    @contextlib.contextmanager
+    def worker_state(x,v):
+        x.append(v)
+        try:
+            yield
+        finally:
+            x.remove(v)
+    with worker_state([],1) :
+      pass
+      
+    注：a,c是一样的，
+
+4.
+  m=1
+  def outer():
+      x,y,z=1,2,3
+      def inner():
+          print(y,z)
+          print(m)
+      return inner
+  f=outer()
+  print(f.__closure__)     #(<cell at 0x10ae50288: int object at 0x10acf7ae0>, <cell at 0x10aed00a8: int object at 0x10acf7b00>)
+  print(f.__closure__[0].cell_contents)   #2
+  print([x.cell_contents for x in f.__closure__]) #[2, 3] 即保存的值
+  注：闭包只包括本层和除全局变量以外的自由变量
+5.时间结构可以简化为空间结构，时间结构是空间结构的一种属性
+6.
+  def outer1(func):
+    def inner():
+        print('a')
+        func()
+        print('b')
+    return inner
+
+  def outer2(func):
+      def inner():
+          print('c')
+          func()
+          print('d')
+      return inner
+  def outer3(func):
+      def inner():
+          print('e')
+          func()
+          print('f')
+      return inner
+  @outer1
+  @outer2
+  @outer3
+  def func():
+      pass
+  func()
+  a,c,e f,d,b
+7.
+  @outer 即：func=outer（func）
+  传参： @outer 即：func（x,y）=outer（func）(x,y)
+  
+  装饰器传参：
+  def decorator(name):
+      print("在这里使用装饰器的name参数：", name)
+      def wrapper(func):
+          print("在这里也可用装饰器的name参数：", name)
+          def _wrapper(*args, **kwargs):
+              print("这里还可使用装饰器的name参数：", name)
+              ret = func(*args, **kwargs)    # 这里进行原函数的计算
+              return ret*2
+          return _wrapper                    # 返回可调用对象，_wrapper可以接受原函数的参数
+      return wrapper                         # 返回真正的装饰器，接受原函数作为第一个参数
+
+  @decorator('haha')
+  def wait_for_deco(x, y):
+      return x + y
+      
+8.
+  a:
+    class X:
+      def __init__(self,func):
+          print(1)
+          func()
+          print(2)
+      def test(self):
+          print('test')
+
+    @X
+    def func():
+        pass
+
+    func.test()
+  b:
+    class X:
+      def __init__(self,arg):
+          self.arg=arg
+
+      def __call__(self, func):
+          print('test')
+          func()
+
+    @X(1)
+    def func():
+        pass
+  c:
+    class X:
+      def __init__(self,arg):
+          self.arg=arg
+
+      def __call__(self, func):
+          print('test')
+          func()
+
+      def oper(func):
+          def inner(*arg,**kwargs):
+              print(1)
+          return inner
+
+    @X.oper
+    def func():
+        pass
+
+    func() #1
+ d:
+  class X:
+    def __init__(self,arg):
+        self.arg=arg
+
+    def __call__(self, func):
+        print('test')
+        func()
+    def oper(arg):
+        def outer(func):
+            def inner(*arg,**kwargs):
+                print(1)
+            return inner
+        return outer
+
+    @X.oper(1)
+    def func():
+        pass
+
+    func() #1
+ e:
+  class X:
+    def __init__(self,arg):
+        self.arg=arg
+
+    def __call__(self, func):
+        print('test')
+        func()
+
+  x=X(1)
+  @x
+  def func():
+      pass
+ f:
+  class X:
+    def __init__(self,arg):
+        self.arg=arg
+
+    def __call__(self, arg):
+        def outer(func):
+            def inner(*arg,**kwargs):
+                print(1)
+            return inner
+        return outer
+
+  x=X(1)
+  @x(2)
+  def func():
+      pass
+g:
+  class X:
+    def __init__(self,arg):
+        self.arg=arg
+    def test(self,func):
+        pass
+
+  x=X(1)
+  @x.test
+  def func():
+      pass
+h:
+  class X:
+    def __init__(self,arg):
+        self.arg=arg
+    def test(self,arg):
+        def outer(func):
+            def inner(*arg, **kwargs):
+                print(1)
+            return inner
+        return outer
+
+  x=X(1)
+  @x.test(2)
+  def func():
+      pass
+  
+
