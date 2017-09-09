@@ -1,0 +1,106 @@
+grequests：
+    import grequests
+    slice_item=[url]*1000
+    ret=(grequests.get(u, headers=headers, proxies=pm.getProxyV2(),timeout=10) for u in slice_item)
+    ret=grequests.imap(ret,size=30)
+
+概念：
+    阻塞：程序在等待某个操作完成期间，自身无法继续干别的事情，则称该程序在该操作上是阻塞的。
+    非阻塞：程序在等待某操作过程中，自身不被阻塞，可以继续运行干别的事情，则称该程序在该操作上是非阻塞的。
+          非阻塞的存在是因为阻塞存在，正因为某个操作阻塞导致的耗时与效率低下，我们才要把它变成非阻塞的。
+    同步：不同程序单元为了完成某个任务，在执行过程中需靠某种通信方式以协调一致，称这些程序单元是同步执行的。
+        同步意味着有序。
+    异步：
+      为完成某个任务，不同程序单元之间过程中无需通信协调，也能完成任务的方式。
+      异步意味着无序
+    并发：
+      以利用有限的计算机资源使多个任务可以被实时或近实时执行为目的。
+    并行：
+      以利用富余计算资源（多核CPU）加速完成多个任务为目的。
+    并行是为了利用多核加速多任务完成的进度
+    并发是为了让独立的子任务都有机会被尽快执行，但不一定能加速整体进度
+    非阻塞是为了提高程序整体执行效率
+    异步是高效地组织非阻塞任务的方式
+    异步编程：以进程、线程、协程、函数/方法作为执行任务程序的基本单位，结合回调、事件循环、信号量等机制，以提高程序整体执行效率和并发能力的编程方式。
+    一次只允许处理一个事件。
+    一旦采取异步编程，每个异步调用必须“足够小”。
+    回调（Callback）
+
+异步程序：
+  import asyncio
+  import aiohttp
+  import uvloop
+  headers = {
+      'accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+      'accept-encoding':'gzip, deflate, br',
+      'accept-language':'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4,zh-TW;q=0.2',
+      'cache-control':'max-age=0',
+      'upgrade-insecure-requests':'1',
+      'user-agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
+  }
+  j=0
+  url='https://s.2.taobao.com/list/waterfall/waterfall.htm?wp={}&_ksTS=1502424139973_130&callback=jsonp131&stype=1&catid={}&st_trust=1&ist=1'
+  pages = [str(i) for i in range(1000)]
+  catids = ["50100399"]
+  async def getPage(session, page,catid):
+      global j
+      with aiohttp.Timeout(60):
+          async with session.get(url.format(page,catid), headers=headers, proxy=pm.getProxyV2()['http']) as resp:
+              print(await resp.text())
+              # print(await type(resp.text()))
+
+
+  loop = uvloop.new_event_loop()
+  asyncio.set_event_loop(loop)
+  session = aiohttp.ClientSession(loop=loop)
+
+  tasks = []
+  for catid in catids:
+      for page in pages:
+          tasks.append(getPage(session, page,catid))
+
+  loop.run_until_complete(asyncio.gather(*tasks))
+
+  loop.close()
+  session.close()
+
+多进程：
+    from concurrent import futures
+    import requests
+    def func():
+        url = 'https://detail.m.tmall.com/item.htm?id=%s' % (538419935978)
+        print('GET: %s' % url)
+        data = requests.get(url).content
+
+    workers=10
+    with futures.ProcessPoolExecutor(workers) as excutor:
+        futs={excutor.submit(func) for i in range(100)}
+
+        result=[fut.result() for fut in futs]
+注：多进程进程切换开销大
+
+多线程：
+  from concurrent import futures
+  
+  with futures.ThreadPoolExecutor(workers) as executor:
+    res=executor.map(work,slice_list)
+io阻塞：
+  import gevent
+  import requests
+  def f(url):
+    print('GET: %s' % url)
+    data = requests.get(url).content
+  url = 'https://detail.m.tmall.com/item.htm?id=%s' % (538419935978)
+  tasks = [gevent.spawn(f, url) for i in range(100)]
+防止io阻塞：
+  from gevent import monkey; monkey.patch_all()
+  import gevent
+  import requests
+  def f(url):
+    print('GET: %s' % url)
+    data = requests.get(url).content
+  url = 'https://detail.m.tmall.com/item.htm?id=%s' % (538419935978)
+  tasks = [gevent.spawn(f, url) for i in range(100)]
+
+
+
