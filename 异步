@@ -42,7 +42,7 @@ grequests：
   url='https://s.2.taobao.com/list/waterfall/waterfall.htm?wp={}&_ksTS=1502424139973_130&callback=jsonp131&stype=1&catid={}&st_trust=1&ist=1'
   pages = [str(i) for i in range(1000)]
   catids = ["50100399"]
-  async def getPage(session, page,catid):
+  async def getpage(session, page,catid):
       global j
       with aiohttp.Timeout(60):
           async with session.get(url.format(page,catid), headers=headers, proxy=pm.getProxyV2()['http']) as resp:
