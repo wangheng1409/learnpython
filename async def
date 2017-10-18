@@ -1,0 +1,67 @@
+# !/usr/bin/env python
+# -*- coding:utf-8 -*-
+
+#async def
+#async def 定义的是一个原生协程函数，而调用协程函数得到的返回值才是协程
+
+async def read_data(db):
+    data=await db.fetch('select * from db1')
+    pass
+
+#type(read_data) ,function,原生协程函数
+
+#core=read_data(db)  type(core) coroutine 协程
+
+async def func():
+    await read_data(1)
+
+#awaitable 对象有以下几种：
+#   调用原生协程函数返回的原生协程
+#被 @asyncio.coroutine 装饰的生成器函数调用返回的生成器协程
+#实现了__await__方法的对象
+#     __await_必须返回迭代器，否则会报typeerror，实现了 __await_的对象也被称为类似未来对象
+
+#await 后只能跟awaitable对象，否则会报typeerror，await必须在async def内使用
+
+
+async def say_hello():
+    print('in say_hello')
+    return 'Hello'
+
+async def say_word():
+    print('in say_word')
+    return 'Word'
+
+async def say_helloword():
+    print('in say_helloword')
+    value=await say_hello()+ await say_word()
+    return value
+
+import uvloop
+import asyncio
+
+事件循环策略
+
+    # policy=asyncio.get_event_loop_policy() #<asyncio.unix_events._UnixDefaultEventLoopPolicy object at 0x10aa52b00>
+
+    # policy=uvloop.EventLoopPolicy()
+    # asyncio.set_event_loop_policy(policy)
+    # policy=asyncio.get_event_loop_policy()  #<uvloop.EventLoopPolicy object at 0x10a04bda0>
+
+    #uvloop 的事件循环效率高，asyncio内的事件循环稳定性高
+
+事件循环
+    每个python线程可以设置不同的事件循环
+    
+    获取事件循环：
+        default_loop=asyncio.get_event_loop()
+        default_loop=asyncio.get_event_loop_policy().get_event_loop()
+    设置事件循环：
+    
+    
+  
+
+
+
+
+
