@@ -53,10 +53,66 @@ import asyncio
 事件循环
     每个python线程可以设置不同的事件循环
     
-    获取事件循环：
-        default_loop=asyncio.get_event_loop()
+    获取当前事件循环：
+        default_loop=asyncio.get_event_loop()    #一般写这一行就能获取到默认的事件循环
         default_loop=asyncio.get_event_loop_policy().get_event_loop()
+        
     设置事件循环：
+        asyncio.set_event_loop(loop)
+        asyncio.get_event_loop_policy().set_event_loop(loop)
+        
+    生成事件循环：
+        new_loop=asyncio.new_event_loop()
+        new_loop=asyncio.get_event_loop_policy().new_event_loop()
+    
+    注1:同一个进程最好只使用一个事件循环策略，且在多线程下只使用该策略生成的事件循环对象
+    注2:python只会为主线设置默认的事件循环策略，以及默认的事件循环，但不会为自线程设置，如果在子线程调用asyicio.get_event_loop()，会报runtimeerrorr
+        方法1:在子线程设置新的事件循环对象，new_loop=asyncio.new_event_loop()
+        方法2:把主线程的事件循环对象当参数传给子线程
+    注3:除了子线程之外，其它地方只需要asyicio.get_event_loop()，得到的就是默认的事件循环
+    
+    执行完4个任务后退出：   
+        import asyncio
+
+        loop=asyncio.get_event_loop()
+
+
+        for i in range(4):
+            loop.create_task(say_hello()) #将协程封装成task对象，并加入loop进行调度
+            if i==5:
+                loop.stop() #会执行完所有已经加入loop的任务
+
+        loop.run_forever()
+
+    执行完6个任务后退出：
+        import asyncio
+
+        loop=asyncio.get_event_loop()
+
+
+        for i in range(4):
+            loop.create_task(say_hello()) #将协程封装成task对象，并加入loop进行调度
+        loop.stop()
+
+        for i in range(2):
+            loop.create_task(say_hello()) #将协程封装成task对象，并加入loop进行调度
+        loop.run_forever()
+    结论：只要在run_forever之前加入的所有任务都会被执行
+
+    loop.close()    强制关闭loop，毁灭性的，一般只使用loop.stop()
+    注：正在运行中的loop是不能close的
+
+    
+    
+    
+        
+    
+   
+    
+    
+    
+    
+        
     
     
   
