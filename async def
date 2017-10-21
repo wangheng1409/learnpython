@@ -101,6 +101,67 @@ import asyncio
 
     loop.close()    强制关闭loop，毁灭性的，一般只使用loop.stop()
     注：正在运行中的loop是不能close的
+    
+    loop.run_until_complete(future) # 运行loop,能够得到协程的返回值
+
+
+Future:
+    区分：
+        concurrent.futures.Future:多线程／多进程执行异步任务
+        asyncio.Future:单线程执行异步任务
+    创建future：
+        方式1:fut=asyncio.Future(loop=None) #如果不传None，将使用asyncio.get_event_loop()
+        方式2:fut=loop.create_future()
+        
+        
+Task：
+    创建：
+        1. task = asyncio.Task(coro, *, loop=None)
+        2. task = asyncio.ensure_future(coro, *, loop=None) 
+        3. task = loop.create_task(coro) # 调用Task类 只接受coro
+
+    区别：
+        #传core,asyncio.ensure_future()直接调用create_task()
+        asyncio.ensure_future() #传Future,直接return，传Future-like先封装成协程，然后调用create_task()
+        create_task()#只接收协程
+        
+        
+同时执行多个协程：
+   
+        asyncio.wait([say_hello(),say_word()])
+        #fs = {ensure_future(f, loop=loop) for f in set(fs)}
+        #Returns two sets of Future: (done, pending).
+        #Usage:done, pending = yield from asyncio.wait(fs)
+        #如果设置timeout，就算Future没有执行完也不会产出TimeoutError
+
+
+
+
+        asyncio.as_completed([say_hello(),say_word()])
+        #todo = {ensure_future(f, loop=loop) for f in set(fs)}
+        #Return an iterator whose values are coroutines，即 值是协程的可叠带对象
+        #会按照完成的顺序得到结果
+        #如果设置timeout,当Future没有执行完，将会reaise TimeoutError
+
+        asyncio.gather([say_hello(),say_word()])
+
+        '''
+            for arg in set(coros_or_futures):
+                if not futures.isfuture(arg):
+                    fut = ensure_future(arg, loop=loop)'''
+
+        '''
+        Return a future aggregating results from the given coroutines
+            or futures，根据传进来的协程或者Future,返回聚合后的Future result'''
+
+        '''
+        All futures must share the same event loop'''
+        #如果全部执行成功，就会返回一个不一定按顺序的结果list，如果有异常也会收集异常结果
+
+
+     
+    
+    
 
     
     
